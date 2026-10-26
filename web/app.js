@@ -499,8 +499,14 @@
       if (!accs || !accs.length) return detach();
       provider.getSigner().then((s) => attach(provider, s, accs[0]));
     });
-    window.ethereum.on?.("chainChanged", () => location.reload());
-    window.ethereum.on?.("disconnect", () => detach());
+    window.ethereum.on?.("chainChanged", (hexChain) => {
+      const id = parseInt(hexChain, 16);
+      if (Number.isFinite(id) && id !== Number(CFG.chainId)) location.reload();
+    });
+    window.ethereum.on?.("disconnect", () => softDisconnect());
+    window.ethereum.on?.("accountsChanged", (accs2) => {
+      if (!accs2 || !accs2.length) softDisconnect();
+    });
   }
 
   async function connectWalletConnect() {
@@ -536,7 +542,7 @@
       const provider = new ethers.BrowserProvider(wc);
       provider.getSigner().then((s) => attach(provider, s, accs[0]));
     });
-    wc.on("disconnect", () => detach());
+    wc.on("disconnect", () => softDisconnect());
     await wc.connect();
     const provider = new ethers.BrowserProvider(wc);
     const signer = await provider.getSigner();
@@ -547,6 +553,7 @@
     S.eip1193Provider = provider;
     S.signer = signer;
     S.account = ethers.getAddress(address);
+    S.justConnected = Date.now();
     S.nft = new ethers.Contract(CFG.nft, NFT_ABI, signer);
     S.market = new ethers.Contract(CFG.market, MARKET_ABI, signer);
     const b = $("walletBtn");
@@ -556,6 +563,15 @@
     toast(T("toast.connected") + " " + short(S.account));
     refresh();
     renderMine();
+  }
+
+  function softDisconnect() {
+    // wallet kadang mengirim disconnect palsu saat pindah halaman; jangan hapus alamat
+    toast("wallet melaporkan terputus — tekan Connect untuk menyambung lagi", true);
+    const b = $("walletBtn");
+    b.classList.remove("solid");
+    b.textContent = T("nav.connect");
+    $("mintBtn").disabled = true;
   }
 
   function detach() {
@@ -572,6 +588,7 @@
   async function mint() {
     if (!S.account) return openSheet();
     if (S.busy) return;
+    if (S.justConnected && Date.now() - S.justConnected < 2500) return; // tap-through setelah connect
     S.busy = true;
     $("mintBtn").disabled = true;
     try {
@@ -588,6 +605,7 @@
         value: q
       });
 
+      if (q > 0n && !confirm(`Mint 1 piece for ${fmtEther(q)} BNB?`)) return;
       toast(T("toast.confirm"));
       const tx = await S.nft.mint({ value: q });
       await tx.wait();
