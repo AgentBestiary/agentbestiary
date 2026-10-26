@@ -1,0 +1,11 @@
+node_modules/
+artifacts/
+cache/
+typechain-types/
+.env
+*.log
+art/*.svg
+art/preview/t*.svg
+art/preview/sheet.html
+art/preview/
+art/*.png

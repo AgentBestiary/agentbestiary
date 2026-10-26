@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Agent Bestiary — on-chain specimens for .ai Agent IDs</title>
+<meta name="description" content="5,000 specimens on BNB Chain. One free piece per .ai Agent ID, then 0.0003 BNB. Art generated inside the contract. Two-sided market: asks and bids."/>
+<link rel="stylesheet" href="style.css"/>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+</head>
+<body>
+<div class="shell">
+
+  <div class="topbar">
+    <div class="wordmark">
+      <div class="glyph"></div>
+      <b>Agent Bestiary</b>
+      <span>specimen intake</span>
+    </div>
+    <div class="nav">
+      <a href="#intake" class="navlink" data-scroll="intake" data-i18n="nav.intake">Intake</a>
+      <a href="#agents" class="navlink" data-scroll="agents" data-i18n="nav.agents">Agents</a>
+      <a href="#market" class="navlink" data-scroll="market" data-i18n="nav.market">Market</a>
+      <span class="langs">
+        <button class="lang" data-lang="en">EN</button>
+        <button class="lang" data-lang="id">ID</button>
+        <button class="lang" data-lang="zh">中文</button>
+      </span>
+      <button class="btn" id="walletBtn" data-i18n="nav.connect">Connect</button>
+    </div>
+  </div>
+
+  <div class="masthead">
+    <div>
+      <div class="eyebrow"><i></i><span id="liveLabel" data-i18n="live.label">bsc mainnet · live</span></div>
+      <h1><span data-i18n="hero.title1">Five thousand specimens.</span> <em data-i18n="hero.title2">One per agent.</em></h1>
+      <p class="lede" data-i18n="hero.lede">
+        Every piece prints your agent's handle straight from the Agent ID registry on BNB Chain.
+      </p>
+
+      <div class="console" id="intake">
+        <div class="head"><span data-i18n="console.title">specimen intake</span><b id="revealState">sealed</b></div>
+        <div class="readout">
+          <div class="row"><span class="k" data-i18n="console.price">Your wallet price</span><span class="v acc" id="myQuote">—</span></div>
+          <div class="row"><span class="k" data-i18n="console.mine">Your pieces</span><span class="v" id="myCount">—</span></div>
+          <div class="row"><span class="k" data-i18n="console.agent">Agent ID status</span><span class="v" id="myAgent">—</span></div>
+        </div>
+        <div class="foot">
+          <div class="bar"><i id="mintBar"></i></div>
+          <div class="tinyNote" id="mintBarLabel" data-i18n="console.loading">reading chain…</div>
+          <div style="margin-top:11px"><button class="btn solid wide" id="mintBtn" data-i18n="btn.connectWallet">Connect wallet</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="specimen">
+      <div class="frame" id="specimenFrame">
+        <div class="placeholder">
+          <div data-i18n="specimen.none">SPECIMEN</div>
+          <div style="color:#6d7686" data-i18n="specimen.nofree">no piece yet</div>
+          <div style="color:#3d4553" data-i18n="specimen.mint">mint to see it</div>
+        </div>
+      </div>
+      <span class="corner tl"></span><span class="corner tr"></span>
+      <span class="corner bl"></span><span class="corner br"></span>
+      <div class="caption">
+        <span id="specimenId">—</span>
+        <span><b id="specimenTier">—</b> · <span id="specimenAgent">—</span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ticker">
+    <div class="cell"><span class="k" data-i18n="ticker.minted">Minted</span><span class="v" id="sMinted">—</span></div>
+    <div class="cell"><span class="k" data-i18n="ticker.free">Free used</span><span class="v" id="sFree">—</span></div>
+    <div class="cell"><span class="k" data-i18n="ticker.price">Price</span><span class="v" id="sPrice">—</span></div>
+    <div class="cell"><span class="k" data-i18n="ticker.floor">Floor ask</span><span class="v" id="sFloor">—</span></div>
+    <div class="cell"><span class="k" data-i18n="ticker.book">Ask / Bid</span><span class="v" id="sBook">—</span></div>
+    <div class="cell"><span class="k" data-i18n="ticker.reveal">Reveal block</span><span class="v" id="sReveal">—</span></div>
+  </div>
+
+  <section id="log">
+    <div class="secHead">
+      <h2 data-i18n="log.title">Just arrived</h2>
+      <div class="sub" data-i18n="log.sub">read from contract events</div>
+    </div>
+    <div class="split">
+      <div class="log" id="intakeLog"><div class="empty" data-i18n="console.loading">reading chain…</div></div>
+
+      <div id="agents">
+        <div class="prompt">
+          <div class="ph"><span data-i18n="prompt.title">prompt for agents</span><span></span></div>
+          <pre id="agentPrompt">…</pre>
+          <div class="pf">
+            <span class="tinyNote" data-i18n="prompt.note">paste into any agent that holds an Agent ID wallet</span>
+            <button class="btn tiny" id="copyPrompt" data-i18n="btn.copy">Copy</button>
+          </div>
+        </div>
+        <div class="tinyNote" style="margin-top:10px">
+          <span data-i18n="prompt.help">The agent checks hasAgentId and quote first, simulates, then sends.</span>
+          <a href="llms.txt" style="color:#f0c26a">llms.txt</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="market">
+    <div class="secHead">
+      <h2 data-i18n="market.title">Market</h2>
+      <div class="sub" data-i18n="market.sub">2% fee · 2.5% royalty · both sides</div>
+    </div>
+    <div class="filters">
+      <button class="chip on" data-filter="asks" data-i18n="market.asks">Ask</button>
+      <button class="chip" data-filter="bids" data-i18n="market.bids">Bid</button>
+      <button class="chip" data-filter="all" data-i18n="market.all">All</button>
+    </div>
+    <div class="book" id="book"></div>
+  </section>
+
+  <section id="mine" class="hidden">
+    <div class="secHead">
+      <h2 data-i18n="mine.title">Your pieces</h2>
+      <div class="sub" id="mineSub">—</div>
+    </div>
+    <div class="book" id="myBook"></div>
+  </section>
+
+  <div class="foot">
+    <span>Agent Bestiary · BNB Chain</span>
+    <span><a href="#" id="nftLink">nft</a> · <a href="#" id="mkLink">market</a> · <a href="llms.txt">llms.txt</a></span>
+    <span>Agent Bestiary © 2026</span>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="sheetWrap" id="walletSheet">
+  <div class="sheet">
+    <div class="sh"><b data-i18n="sheet.title">Connect wallet</b><span id="sheetClose">✕</span></div>
+    <div class="body" id="sheetList"></div>
+    <div class="sf" data-i18n="sheet.hint">On mobile pick the wallet you have installed.</div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="i18n.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

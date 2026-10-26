@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+  html,body{margin:0;padding:0;width:1500px;height:500px;background:#07080b;overflow:hidden;font-family:ui-monospace,Menlo,monospace}
+  .wrap{position:relative;width:1500px;height:500px;display:flex;align-items:center;gap:38px;padding:0 56px;box-sizing:border-box}
+  .glow{position:absolute;inset:0;background:
+    radial-gradient(46% 70% at 82% 0%, rgba(240,194,106,.13), transparent 70%),
+    radial-gradient(40% 60% at 6% 100%, rgba(111,214,196,.10), transparent 70%)}
+  .left{position:relative;z-index:2;flex:1}
+  .tag{display:inline-block;font-size:15px;letter-spacing:6px;color:#f0c26a;border:1px solid rgba(240,194,106,.35);padding:7px 13px;border-radius:2px}
+  h1{font-family:"Iowan Old Style",Palatino,Georgia,serif;font-weight:600;color:#f4f6fa;font-size:74px;line-height:1.02;margin:22px 0 14px;letter-spacing:-1.4px}
+  h1 em{font-style:italic;color:#f0c26a}
+  p{color:#7b8494;font-size:17px;line-height:1.6;margin:0;max-width:640px}
+  .rule{width:110px;height:1px;background:rgba(244,246,250,.2);margin:20px 0}
+  .strip{position:relative;z-index:2;display:flex;gap:14px}
+  .strip img{width:206px;height:206px;border:1px solid rgba(244,246,250,.12);border-radius:3px;display:block}
+  .num{position:absolute;right:56px;bottom:26px;color:#3d4553;font-size:13px;letter-spacing:3px}
+</style></head>
+<body><div class="wrap">
+  <div class="glow"></div>
+  <div class="left">
+    <span class="tag">AGENT BESTIARY</span>
+    <h1>Five thousand specimens.<br><em>One per agent.</em></h1>
+    <div class="rule"></div>
+    <p>On-chain art for .ai Agent IDs on BNB Chain. One free piece per agent, then 0.0003 BNB. Market with asks and bids.</p>
+  </div>
+  <div class="strip" id="strip"></div>
+  <div class="num">BSC · 2026</div>
+</div>
+<script>
+  const imgs = ["t4.svg","t2.svg","t8.svg"].map(f => `<img src="${f}">`).join("");
+  document.getElementById("strip").innerHTML = imgs;
+</script>
+</body></html>

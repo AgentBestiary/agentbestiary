@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Agent Bestiary — .ai-gated specimens on BSC</title>
+<meta name="description" content="On-chain specimens for .ai Agent IDs. 1 free piece per agent, then 0.0003 BNB. Two-sided market: asks and bids."/>
+<link rel="stylesheet" href="style.css"/>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="bar">
+    <div class="brand">
+      <div class="mark"></div>
+      <div>
+        <b>AGENT BESTIARY</b>
+        <small><span class="pulse"></span><span id="liveDot">live · bsc</span></small>
+      </div>
+    </div>
+    <button class="btn" id="walletBtn">CONNECT WALLET</button>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><div class="k">MINTED</div><div class="v" id="sMinted">—</div></div>
+    <div class="stat"><div class="k">GRATIS TERPAKAI</div><div class="v" id="sFree">—</div></div>
+    <div class="stat"><div class="k">HARGA</div><div class="v" id="sPrice">—</div></div>
+    <div class="stat"><div class="k">FLOOR</div><div class="v" id="sFloor">—</div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="mint">MINT</button>
+    <button class="tab" data-tab="market">MARKET</button>
+    <button class="tab" data-tab="mine">KEPING GUE</button>
+  </div>
+
+  <!-- MINT -->
+  <section class="panel" id="panel-mint">
+    <div class="mintGrid">
+      <div class="previewCard" id="previewCard">
+        <div style="color:#5b6478;font-size:11px;letter-spacing:2px;text-align:center;padding:24px;line-height:1.8">
+          SPECIMEN<br/>SEALED<br/><span style="opacity:.5">reveal setelah blok target</span>
+        </div>
+      </div>
+      <div class="mintSide">
+        <h2>Spesimen untuk Agent ID.</h2>
+        <p class="lede">
+          Tiap keping mencetak nama agent lu langsung dari registry on-chain — bukan data yang kami isi.
+          Keping pertama gratis untuk 1.000 agent pertama, sisanya 0,0003 BNB. Maksimal 5 per wallet.
+          Art 100% di dalam kontrak: tidak ada IPFS, tidak ada server yang bisa mati.
+        </p>
+
+        <div class="quoteBox">
+          <div class="row"><span>Harga untuk wallet lu</span><span id="myQuote">connect dulu</span></div>
+          <div class="row"><span>Keping lu</span><span id="myCount">—</span></div>
+          <div class="row"><span>Status agent</span><span id="myAgent">—</span></div>
+          <div class="row"><span>Reveal</span><span id="revealState">—</span></div>
+        </div>
+
+        <button class="btn primary" id="mintBtn" style="width:100%">CONNECT WALLET</button>
+
+        <div style="margin-top:16px">
+          <div style="height:6px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden">
+            <div id="mintBar" style="height:100%;width:0%;background:linear-gradient(90deg,#5ce1e6,#c39bff);transition:.5s"></div>
+          </div>
+          <div class="hint" id="mintBarLabel" style="margin-top:7px">0% minted</div>
+        </div>
+
+        <div class="barrier"></div>
+        <div class="hint">
+          Butuh Agent ID? Buat gratis di aplikasi Binance Wallet → halaman utama → banner Agent ID.
+          Tanpa Agent ID, kontrak menolak mint (bukan gate buatan kami — dibaca dari registry).
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARKET -->
+  <section class="panel" id="panel-market" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div>
+        <h2 style="margin:0;font-size:20px;letter-spacing:1px">Market</h2>
+        <div class="hint" style="margin-top:5px">Fee 2% ke treasury · royalty 2,5% ke pembuat · ask dan bid dua arah</div>
+      </div>
+      <div class="hint"><span id="askCount">0</span> ask · <span id="bidListCount">0</span> bid</div>
+    </div>
+    <div class="grid" id="marketGrid"></div>
+    <div class="barrier"></div>
+    <h3 style="font-size:13px;letter-spacing:2px;color:#7d879b;margin:0 0 4px">BID TERBUKA</h3>
+    <div class="grid" id="bidGrid"></div>
+  </section>
+
+  <!-- MINE -->
+  <section class="panel" id="panel-mine" style="display:none">
+    <h2 style="margin:0 0 4px;font-size:20px;letter-spacing:1px">Keping gue</h2>
+    <div class="hint" style="margin-bottom:6px">List = pasang harga · Bid = tawar keping lain · Sell into bid = jual ke bid yang ada</div>
+    <div class="grid" id="myPieces"></div>
+  </section>
+
+  <footer class="foot">
+    <span>AGENT BESTIARY · BSC</span>
+    <a href="#" id="contractLink">contract</a>
+    <a href="#" id="marketLink">market</a>
+    <span>no owner · no pause · no withdraw</span>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="walletSheet" id="walletSheet">
+  <div class="sheet">
+    <h3 style="display:flex;justify-content:space-between;align-items:center">
+      CONNECT WALLET
+      <span id="sheetClose" style="cursor:pointer;color:#7d879b">✕</span>
+    </h3>
+    <p>Pilih wallet. Di HP, pilih wallet yang terpasang supaya langsung terbuka di dalam app.</p>
+    <div id="sheetList"></div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<html><body style='margin:0'><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  
+<defs>
+  <radialGradient id="spot" cx="0.5" cy="0.34" r="0.7">
+    <stop offset="0" stop-color="#1b2334"/><stop offset="1" stop-color="#04060b"/>
+  </radialGradient>
+  <linearGradient id="metal" x1="0.15" y1="0" x2="0.85" y2="1">
+    <stop offset="0" stop-color="#f2f7ff"/><stop offset="0.45" stop-color="#9aa8c2"/><stop offset="1" stop-color="#424c63"/>
+  </linearGradient>
+  <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+    <feGaussianBlur stdDeviation="10" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#f0c26a"/><stop offset="0.5" stop-color="#6fd6c4"/><stop offset="1" stop-color="#f0c26a"/>
+  </linearGradient>
+</defs>
+
+  <rect width="1024" height="1024" fill="#05060a"/>
+  <circle cx="512" cy="512" r="492" fill="url(#spot)"/>
+  <g transform="translate(512 512) scale(0.86) translate(-512 -560)">
+<g>
+  <path d="M512 250 c150 0 236 122 236 282 c0 180 -104 306 -236 306 c-132 0 -236 -126 -236 -306 c0 -160 86 -282 236 -282 z"
+        fill="url(#metal)" stroke="#080b12" stroke-width="7"/>
+  <path d="M512 330 c86 0 134 88 134 196 c0 124 -60 202 -134 202 c-74 0 -134 -78 -134 -202 c0 -108 48 -196 134 -196 z"
+        fill="#ffffff" opacity="0.09"/>
+  <path d="M300 452 q-58 122 -8 236 q42 -102 82 -158 z" fill="url(#metal)" opacity="0.9" stroke="#080b12" stroke-width="5"/>
+  <path d="M724 452 q58 122 8 236 q-42 -102 -82 -158 z" fill="url(#metal)" opacity="0.9" stroke="#080b12" stroke-width="5"/>
+  <circle cx="424" cy="500" r="40" fill="#080b12"/>
+  <circle cx="600" cy="500" r="40" fill="#080b12"/>
+  <circle cx="424" cy="500" r="16" fill="#f0c26a" filter="url(#glow)"/>
+  <circle cx="600" cy="500" r="16" fill="#f0c26a" filter="url(#glow)"/>
+  <circle cx="410" cy="486" r="11" fill="#ffffff" opacity="0.95"/>
+  <circle cx="586" cy="486" r="11" fill="#ffffff" opacity="0.95"/>
+  <path d="M512 556 q42 14 42 42 q0 30 -42 42 q-42 -12 -42 -42 q0 -28 42 -42 z" fill="#f0a04b" stroke="#b8712a" stroke-width="4"/>
+</g>
+</g>
+  <circle cx="512" cy="512" r="424" fill="none" stroke="#f0c26a" stroke-opacity="0.55" stroke-width="3"/>
+  <circle cx="512" cy="512" r="486" fill="none" stroke="#ffffff" stroke-opacity="0.12" stroke-width="2"/>
+  <path id="arc" d="M512,60 a452,452 0 1,1 -0.1,0" fill="none"/>
+  <text font-family="monospace" font-size="46" letter-spacing="14" fill="#8b95a7">
+    <textPath href="#arc" startOffset="4%">AGENT BESTIARY · BNB CHAIN ·</textPath>
+  </text>
+</svg></body></html>
