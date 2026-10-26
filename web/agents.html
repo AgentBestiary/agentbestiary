@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Mint prompt — Agent Bestiary</title>
+<meta name="description" content="Copy-paste prompt that lets any AI agent mint one Agent Bestiary on BNB Chain. Includes the checks, the exact value and the report format."/>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <div class="wordmark">
+      <div class="glyph"></div>
+      <b>Agent Bestiary</b>
+      <span>for agents</span>
+    </div>
+    <div class="nav">
+      <a href="./">Mint</a>
+      <a href="./llms.txt">llms.txt</a>
+      <button class="btn" id="copyTop">Copy prompt</button>
+    </div>
+  </div>
+
+  <section style="padding-top:34px">
+    <div class="eyebrow"><i></i><span>agent intake</span></div>
+    <h1 style="font-size:clamp(30px,4.4vw,52px)">Give your agent <em>one prompt</em>.</h1>
+    <p class="lede" style="max-width:62ch">
+      Paste the text below into any agent that signs with a wallet holding a Binance <code>.ai</code> Agent ID.
+      It checks the registry, reads the price, simulates, sends one transaction, then reports the token id.
+      Nothing else is required — no allowlist, no signature, no API key.
+    </p>
+
+    <div class="split" style="margin-top:26px">
+      <div class="prompt" style="max-height:none">
+        <div class="ph"><span>mint prompt · english</span><span id="nftShort">…</span></div>
+        <pre id="promptText">loading…</pre>
+        <div class="pf">
+          <span class="tinyNote">long form, same as llms.txt</span>
+          <button class="btn tiny solid" id="copyBtn">Copy</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="console" style="margin-top:0">
+          <div class="head"><span>contracts</span><b>bsc · 56</b></div>
+          <div class="readout">
+            <div class="row"><span class="k">NFT</span><span class="v" id="nftAddr">—</span></div>
+            <div class="row"><span class="k">Market</span><span class="v" id="mkAddr">—</span></div>
+            <div class="row"><span class="k">Agent ID registry</span><span class="v">0x60B9…B022F</span></div>
+            <div class="row"><span class="k">Price after the free piece</span><span class="v acc">0.0003 BNB</span></div>
+            <div class="row"><span class="k">Max per wallet</span><span class="v">5</span></div>
+          </div>
+        </div>
+
+        <div class="tinyNote" style="margin-top:14px;line-height:1.85">
+          The prompt stops on purpose when a check fails: no Agent ID, wallet limit reached, quote equal to
+          <code>uint256</code> max, simulation revert, or balance too low for gas. It never approves allowances
+          and never touches the market.
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:34px;display:flex;gap:10px;flex-wrap:wrap">
+      <a class="btn solid" href="./" style="text-decoration:none">Open the mint page</a>
+      <a class="btn" href="./llms.txt" style="text-decoration:none">llms.txt</a>
+      <a class="btn" href="https://bscscan.com/address/0x70e4F0Afb1F0F8E7F99b67F5A25Ab56f132f1eD7" style="text-decoration:none">BscScan</a>
+    </div>
+
+    <div class="foot" style="margin-top:46px">
+      <span>Agent Bestiary · BNB Chain</span>
+      <span>prompt v1 · last verified against the deployed contract</span>
+    </div>
+  </section>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="config.js"></script>
+<script>
+(() => {
+  const CFG = window.BESTIARY_CONFIG || {};
+  const nft = CFG.nft || "0x70e4F0Afb1F0F8E7F99b67F5A25Ab56f132f1eD7";
+  const market = CFG.market || "0x68aC78f59c30D749f4D5168662A4Aa44D3b92117";
+  document.getElementById("nftAddr").textContent = nft.slice(0, 6) + "…" + nft.slice(-4);
+  document.getElementById("mkAddr").textContent = market.slice(0, 6) + "…" + market.slice(-4);
+  document.getElementById("nftShort").textContent = nft.slice(0, 8) + "…";
+
+  const prompt = [
+    "Task: mint exactly 1 Agent Bestiary NFT for the wallet you control.",
+    "",
+    "Network: BNB Smart Chain, chain id 56.",
+    "NFT contract: " + nft,
+    "Agent ID registry: 0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F",
+    "",
+    "Definitions:",
+    '- "your wallet" = the address your runtime signs with. Print it before doing anything.',
+    "- quote(address) returns the exact wei to send. 0 = free piece. 300000000000000 = paid piece (0.0003 BNB). Max uint256 = this wallet already holds 5 pieces.",
+    "",
+    "Pre-flight, all reads, no cost:",
+    "1. Print the wallet address you will use. If you cannot sign with it, stop.",
+    '2. registry.balanceOf(yourWallet) must be > 0. If 0, stop and report "no .ai Agent ID".',
+    '3. mintedBy(yourWallet) must be < 5. If 5, stop and report "wallet limit reached".',
+    "4. Read quote(yourWallet) and print the number.",
+    "   - 0: the piece is free, send 0.",
+    "   - 300000000000000: the free quota is gone, this piece costs 0.0003 BNB.",
+    "   - max uint256: stop, do not mint.",
+    "5. eth_call mint() with value = quote. If it reverts, stop and report the revert reason.",
+    "6. Check the wallet balance covers quote + 0.00005 BNB for gas. If not, stop and report the shortfall.",
+    "",
+    "Execute, one transaction only:",
+    "7. Send mint() with value exactly equal to quote. Never round up, never send extra.",
+    "8. Wait for the receipt. Require status 1. If 0, report the hash and stop.",
+    "",
+    "Report, short and plain:",
+    "- wallet address, free or paid, exact BNB spent, tokenId from the Minted event, tx hash, new balance.",
+    "",
+    "Hard rules:",
+    "- never ask for, print or store a private key or seed phrase.",
+    "- never spend more than 0.0003 BNB for this mint.",
+    "- never approve allowances, never call setApprovalForAll, never touch any contract other than the NFT and the registry.",
+    "- this task is mint only: do not buy, bid, list, sell or transfer.",
+    "- if any check fails, stop and name the check. Do not guess and do not retry with different values.",
+    "",
+    "Full guide: " + location.origin + "/llms.txt"
+  ].join("\n");
+
+  document.getElementById("promptText").textContent = prompt;
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(prompt);
+    } catch (e) {
+      const r = document.createRange();
+      r.selectNodeContents(document.getElementById("promptText"));
+      const s = window.getSelection();
+      s.removeAllRanges();
+      s.addRange(r);
+      document.execCommand && document.execCommand("copy");
+    }
+    const t = document.getElementById("toast");
+    t.textContent = "Prompt copied — paste it into your agent";
+    t.className = "toast show";
+    setTimeout(() => (t.className = "toast"), 3500);
+  }
+  document.getElementById("copyBtn").onclick = copy;
+  document.getElementById("copyTop").onclick = copy;
+})();
+</script>
+</body>
+</html>
