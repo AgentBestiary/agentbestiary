@@ -202,25 +202,55 @@
 
   async function loadIntakeLog() {
     const box = $("intakeLog");
+    // 1) coba event log dengan jendela kecil (rpc publik membatasi getLogs)
+    for (const span of [800, 300, 120]) {
+      try {
+        const latest = await S.provider.getBlockNumber();
+        const evs = await S.readNft.queryFilter("Minted", latest - span, latest);
+        const last = evs.slice(-9).reverse();
+        if (!last.length) break;
+        const rows = [];
+        for (const e of last) {
+          let when = "—";
+          try {
+            const blk = await S.provider.getBlock(e.blockNumber);
+            when = timeAgo(blk.timestamp);
+          } catch (err) {}
+          rows.push(`<div class="line">
+            <span class="id">#${pad(e.args.tokenId)}</span>
+            <span class="who">@${e.args.handle || "unknown"}</span>
+            <span class="when">${when}</span>
+          </div>`);
+        }
+        box.innerHTML = rows.join("");
+        return;
+      } catch (e) {
+        // lanjut ke jendela lebih kecil / fallback
+      }
+    }
+
+    // 2) fallback tanpa log: baca 9 token terakhir dari kontrak
     try {
-      const latest = await S.provider.getBlockNumber();
-      const from = Math.max(0, latest - 6000);
-      const evs = await S.readNft.queryFilter("Minted", from, latest);
-      const last = evs.slice(-9).reverse();
-      if (!last.length) {
+      const total = Number(await S.readNft.totalMinted());
+      if (!total) {
         box.innerHTML = `<div class="empty">${T("log.empty")}</div>`;
         return;
       }
       const rows = [];
-      for (const e of last) {
-        const blk = await S.provider.getBlock(e.blockNumber);
-        rows.push(`<div class="line">
-          <span class="id">#${pad(e.args.tokenId)}</span>
-          <span class="who">@${e.args.handle || "unknown"}</span>
-          <span class="when">${timeAgo(blk.timestamp)}</span>
-        </div>`);
+      for (let id = total; id > Math.max(0, total - 9); id--) {
+        try {
+          const uri = await S.readNft.tokenURI(id);
+          const { json } = decodeToken(uri);
+          const agent = (json?.attributes || []).find((a) => a.trait_type === "Agent")?.value || "unknown";
+          const tier = (json?.attributes || []).find((a) => a.trait_type === "Tier")?.value || "";
+          rows.push(`<div class="line">
+            <span class="id">#${pad(id)}</span>
+            <span class="who">@${agent}</span>
+            <span class="when">${tier.toLowerCase()}</span>
+          </div>`);
+        } catch (err) {}
       }
-      box.innerHTML = rows.join("");
+      box.innerHTML = rows.join("") || `<div class="empty">${T("log.empty")}</div>`;
     } catch (e) {
       box.innerHTML = `<div class="empty">${T("log.err")}</div>`;
     }
