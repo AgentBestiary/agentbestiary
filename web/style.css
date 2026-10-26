@@ -233,3 +233,6 @@ section { padding: 50px 0 0; }
 #intake, #agents, #market, #mine { scroll-margin-top: 78px; }
 .navlink.active { color: var(--amber); }
 .navlink.active::after { content: ""; display: block; height: 1px; background: var(--amber); margin-top: 3px; }
+
+.sheet .sf ol li { margin-bottom: 2px; }
+.sheet .sf b { font-weight: 600; }
