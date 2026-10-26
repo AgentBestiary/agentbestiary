@@ -1,0 +1,16 @@
+<html><body style='margin:0'><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024"><defs>
+ <radialGradient id="spot" cx="0.5" cy="0.34" r="0.72"><stop offset="0" stop-color="#1d2536"/><stop offset="1" stop-color="#05070c"/></radialGradient>
+ <linearGradient id="metal" x1="0.15" y1="0" x2="0.85" y2="1"><stop offset="0" stop-color="#f2f7ff"/><stop offset="0.45" stop-color="#9aa8c2"/><stop offset="1" stop-color="#3f4960"/></linearGradient>
+ <filter id="glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="12" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="1024" height="1024" fill="url(#spot)"/>
+<g transform="translate(512 545) scale(1.42) translate(-512 -545)">
+  <path d="M512 250 c150 0 236 122 236 282 c0 180 -104 306 -236 306 c-132 0 -236 -126 -236 -306 c0 -160 86 -282 236 -282 z" fill="url(#metal)" stroke="#080b12" stroke-width="8"/>
+  <path d="M512 330 c86 0 134 88 134 196 c0 124 -60 202 -134 202 c-74 0 -134 -78 -134 -202 c0 -108 48 -196 134 -196 z" fill="#fff" opacity="0.10"/>
+  <path d="M300 452 q-58 122 -8 236 q42 -102 82 -158 z" fill="url(#metal)" opacity="0.92" stroke="#080b12" stroke-width="5"/>
+  <path d="M724 452 q58 122 8 236 q-42 -102 -82 -158 z" fill="url(#metal)" opacity="0.92" stroke="#080b12" stroke-width="5"/>
+  <circle cx="424" cy="500" r="44" fill="#080b12"/><circle cx="600" cy="500" r="44" fill="#080b12"/>
+  <circle cx="424" cy="500" r="18" fill="#f0c26a" filter="url(#glow)"/><circle cx="600" cy="500" r="18" fill="#f0c26a" filter="url(#glow)"/>
+  <circle cx="409" cy="485" r="12" fill="#fff"/><circle cx="585" cy="485" r="12" fill="#fff"/>
+  <path d="M512 556 q42 14 42 42 q0 30 -42 42 q-42 -12 -42 -42 q0 -28 42 -42 z" fill="#f0a04b" stroke="#b8712a" stroke-width="4"/>
+</g></svg></body></html>

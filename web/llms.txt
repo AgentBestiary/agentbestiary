@@ -8,16 +8,16 @@ Human page: the site root. This file is everything an agent needs.
 
 ## Contracts
 
-- NFT, ERC-721 "Agent Bestiary" (BEAST): `0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82`
-- Market, ask + bid, 2% fee: `0x9A676e781A523b5d0C0e43731313A708CB607508`
+- NFT, ERC-721 "Agent Bestiary" (BEAST): `__NFT__`
+- Market, ask + bid, 2% fee: `__MARKET__`
 - Agent ID registry (mint gate, `balanceOf > 0`): `0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F`
 
 ## Rules
 
 - 5,000 total.
-- One free piece per wallet while the free quota (1,000 pieces) lasts.
-- The remaining four pieces cost `price()` each — 0.0003 BNB, flat, no bonding curve.
-- 5 pieces per wallet maximum (1 free + 4 paid), counted per minting wallet regardless of later transfers.
+- First piece per wallet is free while the free quota (1,000 pieces) lasts.
+- After that, each piece costs `price()` — 0.0003 BNB (flat, no bonding curve).
+- 5 pieces per wallet maximum, counted per minting wallet regardless of later transfers.
 - Mint goes only to the calling wallet; contracts cannot mint for another address.
 - No owner, no pause, no withdraw. Payment goes to the treasury inside the same transaction.
 - Excess BNB is refunded in the same transaction.
@@ -32,16 +32,8 @@ Human page: the site root. This file is everything an agent needs.
     traits(uint256) -> (uint8,uint8,uint8,uint8,uint8)
     tierOf(uint256) -> string            tokenURI(uint256) -> string (data:application/json;base64)
 
-`quote(wallet)` returns exactly the wei to send:
-
-| value | meaning |
-|---|---|
-| 0 | this piece is free (wallet has minted nothing yet and the free quota is not exhausted) |
-| 300000000000000 | paid piece: 0.0003 BNB |
-| type(uint256).max | wallet already holds 5 pieces — stop, do not mint |
-
-Send exactly the quoted value. The contract refunds any excess in the same transaction, but a
-well-behaved agent sends the exact amount and never more than 0.0003 BNB for one piece.
+`quote(wallet)` returns 0 for a free piece, the price for a paid one, and `type(uint256).max`
+when the wallet already holds the maximum. Treat the max value as "stop, do not mint".
 
 ## Minting
 
@@ -54,8 +46,8 @@ Selectors: `mint()` = `0x1249c58b` · `quote(address)` = `0x0b39ed47` · `hasAge
 
 Foundry example:
 
-    cast call 0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82 "quote(address)(uint256)" $WALLET --rpc-url https://bsc-dataseed.bnbchain.org
-    cast send 0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82 "mint()" --value <quote> --rpc-url https://bsc-dataseed.bnbchain.org
+    cast call __NFT__ "quote(address)(uint256)" $WALLET --rpc-url https://bsc-dataseed.bnbchain.org
+    cast send __NFT__ "mint()" --value <quote> --rpc-url https://bsc-dataseed.bnbchain.org
 
 ## Verify after minting
 
@@ -89,7 +81,7 @@ Fee is 2% of the sale, taken from the seller's proceeds. Royalty is 2.5% (ERC-29
 ## Prompt template (copy into any agent)
 
     Mint 1 Agent Bestiary from this agent wallet (BNB Chain, chain id 56).
-    NFT: 0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82 · registry: 0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F
+    NFT: __NFT__ · registry: 0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F
     1. require registry.balanceOf(wallet) > 0, else stop and report "no Agent ID".
     2. read quote(wallet): 0 = free, 300000000000000 = paid, max = limit reached.
     3. eth_call mint() with value = quote; stop on revert.
