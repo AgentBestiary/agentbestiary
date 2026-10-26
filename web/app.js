@@ -367,17 +367,31 @@
   const isMobile = /android|iphone|ipad|ipod/i.test(navigator.userAgent);
 
   function openSheet() {
-    const host = location.host + location.pathname;
+    const url = location.href.split("#")[0];
+    const hasInjected = Boolean(window.ethereum);
     const opts = [
       {
-        nm: "MetaMask",
-        nt: "extension / app",
-        fn: () => (window.ethereum ? connectInjected() : (location.href = `https://metamask.app.link/dapp/${host}`))
+        nm: T("sheet.browser"),
+        nt: hasInjected ? "ready" : "—",
+        fn: async () => {
+          if (hasInjected) return connectInjected();
+          await copyText(url);
+          toast(T("sheet.noWallet"), true);
+        }
       },
-      { nm: "Trust Wallet", nt: "app", fn: () => (location.href = `https://link.trustwallet.com/open_url?coin_id=20000714&url=${encodeURIComponent("https://" + host)}`) },
-      { nm: "Bitget Wallet", nt: "app", fn: () => (location.href = `https://bkcode.vip?action=dapp&url=${encodeURIComponent("https://" + host)}`) },
-      { nm: "Binance Wallet", nt: "app", fn: () => (location.href = `https://app.binance.com/cedefi/dapp?url=${encodeURIComponent("https://" + host)}`) },
-      { nm: "WalletConnect", nt: "qr / universal", fn: () => connectWalletConnect() }
+      {
+        nm: T("sheet.wc"),
+        nt: T("sheet.wcNote"),
+        fn: () => connectWalletConnect()
+      },
+      {
+        nm: T("sheet.copyLink"),
+        nt: "—",
+        fn: async () => {
+          await copyText(url);
+          toast(T("sheet.copied"));
+        }
+      }
     ];
     $("sheetList").innerHTML = opts
       .map((o, i) => `<div class="wrow" data-i="${i}"><span class="dot"></span><span class="nm">${o.nm}</span><span class="nt">${o.nt}</span></div>`)
@@ -388,11 +402,35 @@
         try {
           await opts[Number(el.dataset.i)].fn();
         } catch (e) {
+          const msg = String((e && (e.message || e.reason)) || "");
+          if (/user rejected|rejected by user/i.test(msg)) return;
+          if (/reset|closed|session/i.test(msg)) {
+            toast(T("toast.wcReset"));
+            return;
+          }
           toast(errText(e, "connect failed"), true);
         }
       };
     });
   }
+
+  async function copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (e) {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); } catch (err) {}
+      document.body.removeChild(ta);
+      return true;
+    }
+  }
+
   const closeSheet = () => $("walletSheet").classList.remove("open");
 
   async function connectInjected() {
