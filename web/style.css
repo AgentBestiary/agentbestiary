@@ -236,3 +236,7 @@ section { padding: 50px 0 0; }
 
 .sheet .sf ol li { margin-bottom: 2px; }
 .sheet .sf b { font-weight: 600; }
+
+.wrow.hot { border-color: rgba(240,194,106,.55); background: rgba(240,194,106,.08); }
+.wrow.hot .dot { background: var(--amber); box-shadow: 0 0 10px var(--amber); }
+.wrow.hot .nt { color: var(--amber); }

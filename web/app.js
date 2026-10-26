@@ -411,7 +411,7 @@
       },
       {
         nm: T("sheet.wc"),
-        nt: T("sheet.wcNote"),
+        nt: hasInjected ? T("sheet.wcNote") : "QR · desktop or another phone",
         fn: () => connectWalletConnect()
       },
       {
@@ -424,8 +424,20 @@
       }
     ];
     $("sheetList").innerHTML = opts
-      .map((o, i) => `<div class="wrow" data-i="${i}"><span class="dot"></span><span class="nm">${o.nm}</span><span class="nt">${o.nt}</span></div>`)
+      .map((o, i) => {
+        const hot = i === 0 && hasInjected;
+        return `<div class="wrow${hot ? " hot" : ""}" data-i="${i}">
+          <span class="dot"></span><span class="nm">${o.nm}</span>
+          <span class="nt">${hot ? "READY · tap here" : o.nt}</span>
+        </div>`;
+      })
       .join("");
+    const hint = $("sheetHint");
+    if (hint) {
+      hint.textContent = hasInjected
+        ? "Wallet terdeteksi di browser ini — cukup tekan baris pertama."
+        : T("sheet.hint");
+    }
     $("walletSheet").classList.add("open");
     $("sheetList").querySelectorAll(".wrow").forEach((el) => {
       el.onclick = async () => {
