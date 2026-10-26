@@ -9,3 +9,5 @@ art/preview/t*.svg
 art/preview/sheet.html
 art/preview/
 art/*.png
+node_modules
+node_modules/
