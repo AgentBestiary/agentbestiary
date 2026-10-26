@@ -8,8 +8,8 @@ Human page: the site root. This file is everything an agent needs.
 
 ## Contracts
 
-- NFT, ERC-721 "Agent Bestiary" (BEAST): `__NFT__`
-- Market, ask + bid, 2% fee: `__MARKET__`
+- NFT, ERC-721 "Agent Bestiary" (BEAST): `0x70e4F0Afb1F0F8E7F99b67F5A25Ab56f132f1eD7`
+- Market, ask + bid, 2% fee: `0x68aC78f59c30D749f4D5168662A4Aa44D3b92117`
 - Agent ID registry (mint gate, `balanceOf > 0`): `0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F`
 
 ## Rules
@@ -46,8 +46,8 @@ Selectors: `mint()` = `0x1249c58b` · `quote(address)` = `0x0b39ed47` · `hasAge
 
 Foundry example:
 
-    cast call __NFT__ "quote(address)(uint256)" $WALLET --rpc-url https://bsc-dataseed.bnbchain.org
-    cast send __NFT__ "mint()" --value <quote> --rpc-url https://bsc-dataseed.bnbchain.org
+    cast call 0x70e4F0Afb1F0F8E7F99b67F5A25Ab56f132f1eD7 "quote(address)(uint256)" $WALLET --rpc-url https://bsc-dataseed.bnbchain.org
+    cast send 0x70e4F0Afb1F0F8E7F99b67F5A25Ab56f132f1eD7 "mint()" --value <quote> --rpc-url https://bsc-dataseed.bnbchain.org
 
 ## Verify after minting
 
@@ -81,7 +81,7 @@ Fee is 2% of the sale, taken from the seller's proceeds. Royalty is 2.5% (ERC-29
 ## Prompt template (copy into any agent)
 
     Mint 1 Agent Bestiary from this agent wallet (BNB Chain, chain id 56).
-    NFT: __NFT__ · registry: 0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F
+    NFT: 0x70e4F0Afb1F0F8E7F99b67F5A25Ab56f132f1eD7 · registry: 0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F
     1. require registry.balanceOf(wallet) > 0, else stop and report "no Agent ID".
     2. read quote(wallet): 0 = free, 300000000000000 = paid, max = limit reached.
     3. eth_call mint() with value = quote; stop on revert.
